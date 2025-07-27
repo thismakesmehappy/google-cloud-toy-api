@@ -1,0 +1,129 @@
+swagger: "2.0"
+info:
+  title: Toy API
+  description: A simple toy API for Google Cloud
+  version: 1.0.0
+basePath: /
+
+securityDefinitions:
+  firebaseAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-google-issuer: "https://securetoken.google.com/toy-api-dev" # Replace with your project ID
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "toy-api-dev" # Replace with your project ID
+
+paths:
+  /public:
+    get:
+      summary: Public endpoint
+      operationId: publicMessage
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+  /private:
+    get:
+      summary: Authenticated endpoint
+      operationId: privateMessage
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+  /items:
+    post:
+      summary: Create an item
+      operationId: createItem
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: item
+          required: true
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+      responses:
+        "201":
+          description: Item created
+    get:
+      summary: List items
+      operationId: getItems
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      responses:
+        "200":
+          description: List of items
+  /items/{id}:
+    get:
+      summary: Get an item by ID
+      operationId: getItem
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Item details
+    put:
+      summary: Update an item by ID
+      operationId: updateItem
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+        - in: body
+          name: item
+          required: true
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+      responses:
+        "200":
+          description: Item updated
+    delete:
+      summary: Delete an item by ID
+      operationId: deleteItem
+
+      x-google-backend:
+        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        "204":
+          description: Item deleted
