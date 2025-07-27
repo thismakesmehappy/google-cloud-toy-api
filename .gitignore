@@ -1,0 +1,81 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+.report/
+
+# Node.js
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+.yarn/
+.pnp/
+.pnp.js
+.parcel-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# IDEs and editors
+.idea/
+.vscode/
+.history/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+
+# Terraform
+.terraform/
+*.tfplan
+*.tfstate
+*.tfstate.backup
+
+# Local secrets (should not be committed)
+_HIDDEN/
+
+# Project specific ignores
+google-cloud-toy-api/dist/
+google-cloud-toy-api/node_modules/
+google-cloud-toy-api/package-lock.json
+google-cloud-toy-api/firebase-debug.log
+google-cloud-toy-api/firestore-debug.log
+google-cloud-toy-api/.firebaserc
+google-cloud-toy-api/.gcloudignore
+google-cloud-toy-api/.gitignore
+google-cloud-toy-api/firebase.json
+google-cloud-toy-api/firestore.indexes.json
+google-cloud-toy-api/firestore.rules
+google-cloud-toy-api/tsconfig.json
+google-cloud-toy-api/terraform/*.tfstate
+google-cloud-toy-api/terraform/*.tfstate.backup
+google-cloud-toy-api/terraform/.terraform/
+google-cloud-toy-api/terraform/dev/.terraform.lock.hcl
+google-cloud-toy-api/terraform/dev/function-source.zip
+google-cloud-toy-api/terraform/dev/terraform.tfstate
+google-cloud-toy-api/terraform/dev/terraform.tfstate.backup
+google-cloud-toy-api/terraform/dev/.terraform/
+
+# Root project ignores
+node_modules/
+package-lock.json
+src/
+tsconfig.json
+pom.xml
