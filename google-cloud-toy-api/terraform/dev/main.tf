@@ -11,38 +11,38 @@ provider "google-beta" {
 
 # Enable necessary APIs
 resource "google_project_service" "cloudfunctions_api" {
-  project = var.project_id
-  service = "cloudfunctions.googleapis.com"
+  project            = var.project_id
+  service            = "cloudfunctions.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "apigateway_api" {
-  project = var.project_id
-  service = "apigateway.googleapis.com"
+  project            = var.project_id
+  service            = "apigateway.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "firestore_api" {
-  project = var.project_id
-  service = "firestore.googleapis.com"
+  project            = var.project_id
+  service            = "firestore.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudbuild_api" {
-  project = var.project_id
-  service = "cloudbuild.googleapis.com"
+  project            = var.project_id
+  service            = "cloudbuild.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "iam_api" {
-  project = var.project_id
-  service = "iam.googleapis.com"
+  project            = var.project_id
+  service            = "iam.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudrun_api" {
-  project = var.project_id
-  service = "run.googleapis.com"
+  project            = var.project_id
+  service            = "run.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -86,12 +86,12 @@ resource "google_cloudfunctions2_function" "toy_api_function" {
     available_memory = "256Mi" # Adjust based on free tier limits and needs
     timeout_seconds  = 300
     environment_variables = {
-      NODE_ENV = var.environment
+      NODE_ENV                       = var.environment
       GOOGLE_APPLICATION_CREDENTIALS = ""
       # Add other environment variables here if needed
     }
     ingress_settings = "ALLOW_ALL" # Temporarily allow all for testing
-    }
+  }
 
   depends_on = [
     google_project_service.cloudfunctions_api,
@@ -103,8 +103,8 @@ resource "google_cloudfunctions2_function" "toy_api_function" {
 # Storage bucket for Cloud Function source code
 resource "google_storage_bucket" "source_bucket" {
   name          = "${var.project_id}-cloudfunctions-source" # Must be globally unique
-  location      = "US" # Multi-region for source bucket
-  force_destroy = true # Allows bucket to be destroyed even if not empty
+  location      = "US"                                      # Multi-region for source bucket
+  force_destroy = true                                      # Allows bucket to be destroyed even if not empty
   project       = var.project_id
 
   uniform_bucket_level_access = true
@@ -121,17 +121,17 @@ data "archive_file" "source_zip" {
   type        = "zip"
   source_dir  = "../../" # Path to your Node.js source code
   output_path = "function-source.zip"
-  excludes = ["tsconfig.json", "_HIDDEN/"]
+  excludes    = ["tsconfig.json", "_HIDDEN/"]
 }
 
 # Firestore Database
 resource "google_firestore_database" "database" {
-  project     = var.project_id
-  name        = "(default)" # Default database
-  location_id = var.region # Must be same as Cloud Function for optimal performance
-  type        = "FIRESTORE_NATIVE"
+  project                 = var.project_id
+  name                    = "(default)" # Default database
+  location_id             = var.region  # Must be same as Cloud Function for optimal performance
+  type                    = "FIRESTORE_NATIVE"
   delete_protection_state = "DELETE_PROTECTION_DISABLED" # For easy destruction in dev
-  
+
   depends_on = [
     google_project_service.firestore_api
   ]
@@ -140,8 +140,8 @@ resource "google_firestore_database" "database" {
 # API Gateway
 resource "google_api_gateway_api" "toy_api_gateway" {
   provider = google-beta
-  api_id  = "toy-api-v2-${var.environment}"
-  project = var.project_id
+  api_id   = "toy-api-v2-${var.environment}"
+  project  = var.project_id
 
   depends_on = [
     google_project_service.apigateway_api
@@ -149,14 +149,14 @@ resource "google_api_gateway_api" "toy_api_gateway" {
 }
 
 resource "google_api_gateway_api_config" "toy_api_config" {
-  provider = google-beta
-  api = google_api_gateway_api.toy_api_gateway.api_id
+  provider      = google-beta
+  api           = google_api_gateway_api.toy_api_gateway.api_id
   api_config_id = "default" # Or a version like "v1"
-  project     = var.project_id
+  project       = var.project_id
 
   openapi_documents {
     document {
-      path    = "openapi.yaml"
+      path     = "openapi.yaml"
       contents = filebase64("openapi.yaml") # We will create this file next
     }
   }
@@ -167,7 +167,7 @@ resource "google_api_gateway_api_config" "toy_api_config" {
 }
 
 resource "google_api_gateway_gateway" "toy_api_gateway_instance" {
-  provider = google-beta
+  provider   = google-beta
   gateway_id = "toy-api-gateway-v2-${var.environment}"
   api_config = google_api_gateway_api_config.toy_api_config.id
   project    = var.project_id

@@ -52,7 +52,7 @@ resource "google_cloudfunctions2_function" "function" {
     timeout_seconds  = var.timeout_seconds
     environment_variables = merge(
       {
-        NODE_ENV = var.environment
+        NODE_ENV                       = var.environment
         GOOGLE_APPLICATION_CREDENTIALS = ""
       },
       var.environment_variables

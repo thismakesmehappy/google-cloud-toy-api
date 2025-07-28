@@ -6,38 +6,38 @@ variable "project_id" {
 
 # Enable necessary APIs
 resource "google_project_service" "cloudfunctions_api" {
-  project = var.project_id
-  service = "cloudfunctions.googleapis.com"
+  project            = var.project_id
+  service            = "cloudfunctions.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "apigateway_api" {
-  project = var.project_id
-  service = "apigateway.googleapis.com"
+  project            = var.project_id
+  service            = "apigateway.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "firestore_api" {
-  project = var.project_id
-  service = "firestore.googleapis.com"
+  project            = var.project_id
+  service            = "firestore.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudbuild_api" {
-  project = var.project_id
-  service = "cloudbuild.googleapis.com"
+  project            = var.project_id
+  service            = "cloudbuild.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "iam_api" {
-  project = var.project_id
-  service = "iam.googleapis.com"
+  project            = var.project_id
+  service            = "iam.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudrun_api" {
-  project = var.project_id
-  service = "run.googleapis.com"
+  project            = var.project_id
+  service            = "run.googleapis.com"
   disable_on_destroy = false
 }
 

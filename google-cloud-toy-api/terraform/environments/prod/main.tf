@@ -29,7 +29,7 @@ provider "google-beta" {
 # Shared resources (APIs and IAM)
 module "shared" {
   source = "../../shared"
-  
+
   project_id = var.project_id
 }
 
@@ -44,19 +44,19 @@ data "archive_file" "source_zip" {
 # Cloud Function
 module "cloud_function" {
   source = "../../modules/cloud-function"
-  
-  project_id            = var.project_id
-  project_number        = module.shared.project_number
-  region                = var.region
-  environment           = var.environment
-  source_archive_path   = data.archive_file.source_zip.output_path
-  source_hash           = data.archive_file.source_zip.output_base64sha256
-  
+
+  project_id          = var.project_id
+  project_number      = module.shared.project_number
+  region              = var.region
+  environment         = var.environment
+  source_archive_path = data.archive_file.source_zip.output_path
+  source_hash         = data.archive_file.source_zip.output_base64sha256
+
   # Production-specific settings
-  memory_mb             = "512Mi"                 # More memory for production
-  ingress_settings      = "ALLOW_INTERNAL_ONLY"  # Most restrictive
-  enable_public_access  = false                  # No public access
-  
+  memory_mb            = "512Mi"               # More memory for production
+  ingress_settings     = "ALLOW_INTERNAL_ONLY" # Most restrictive
+  enable_public_access = false                 # No public access
+
   depends_on = [
     module.shared
   ]
@@ -65,11 +65,11 @@ module "cloud_function" {
 # Firestore Database
 module "firestore" {
   source = "../../modules/firestore"
-  
-  project_id = var.project_id
-  location_id = var.region
-  delete_protection_enabled = true  # Enable protection for production
-  
+
+  project_id                = var.project_id
+  location_id               = var.region
+  delete_protection_enabled = true # Enable protection for production
+
   depends_on = [
     module.shared
   ]
@@ -78,15 +78,15 @@ module "firestore" {
 # API Gateway
 module "api_gateway" {
   source = "../../modules/api-gateway"
-  
-  project_id     = var.project_id
-  region         = var.region
-  environment    = var.environment
-  openapi_spec   = templatefile("${path.module}/openapi.yaml", {
+
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  openapi_spec = templatefile("${path.module}/openapi.yaml", {
     backend_url = module.cloud_function.function_url
     project_id  = var.project_id
   })
-  
+
   depends_on = [
     module.cloud_function,
     module.shared
