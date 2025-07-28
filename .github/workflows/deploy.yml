@@ -109,7 +109,19 @@ jobs:
           # Import storage bucket if it exists  
           terraform import module.cloud_function.google_storage_bucket.source_bucket "${{ secrets.GCP_PROJECT_ID_DEV }}-cloudfunctions-source-dev" 2>/dev/null || echo "Storage bucket import skipped"
           
-          echo "✅ Import complete, proceeding with deployment..."
+          # Fix service account permissions
+          echo "🔑 Ensuring proper service account permissions..."
+          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID_DEV }} --format="value(projectNumber)")
+          COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          GITHUB_SA="github-actions-dev@${{ secrets.GCP_PROJECT_ID_DEV }}.iam.gserviceaccount.com"
+          
+          # Grant serviceAccountUser permission
+          gcloud iam service-accounts add-iam-policy-binding "$COMPUTE_SA" \
+            --member="serviceAccount:$GITHUB_SA" \
+            --role="roles/iam.serviceAccountUser" \
+            --project="${{ secrets.GCP_PROJECT_ID_DEV }}" 2>/dev/null || echo "Permission already exists"
+          
+          echo "✅ Setup complete, proceeding with deployment..."
           
           terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"
           terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"

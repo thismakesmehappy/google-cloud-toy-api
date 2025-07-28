@@ -36,9 +36,9 @@ module "shared" {
 # Archive the source code
 data "archive_file" "source_zip" {
   type        = "zip"
-  source_dir  = "../../../src"
+  source_dir  = "../../../"
   output_path = "function-source.zip"
-  excludes    = ["tsconfig.json", "_HIDDEN/"]
+  excludes    = ["terraform/", "dist/", "node_modules/", ".git/", "_HIDDEN/", "*.md"]
 }
 
 # Cloud Function
