@@ -109,9 +109,23 @@ jobs:
           # Import storage bucket if it exists  
           terraform import module.cloud_function.google_storage_bucket.source_bucket "${{ secrets.GCP_PROJECT_ID_DEV }}-cloudfunctions-source-dev" 2>/dev/null || echo "Storage bucket import skipped"
           
+          # Import Cloud Function if it exists
+          terraform import module.cloud_function.google_cloudfunctions2_function.function "projects/${{ secrets.GCP_PROJECT_ID_DEV }}/locations/us-central1/functions/toy-api-function-dev" 2>/dev/null || echo "Cloud Function import skipped"
+          
+          # Get project number for subsequent operations
+          echo "🔍 Getting project information..."
+          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID_DEV }} --format="value(projectNumber)")
+          
+          # Import IAM members that might exist
+          echo "🔄 Importing IAM members..."
+          terraform import module.cloud_function.google_cloudfunctions2_function_iam_member.public_invoker[0] "projects/${{ secrets.GCP_PROJECT_ID_DEV }}/locations/us-central1/functions/toy-api-function-dev allUsers roles/cloudfunctions.invoker" 2>/dev/null || echo "Public invoker IAM import skipped"
+          
+          terraform import module.cloud_function.google_cloudfunctions2_function_iam_member.api_gateway_invoker[0] "projects/${{ secrets.GCP_PROJECT_ID_DEV }}/locations/us-central1/functions/toy-api-function-dev serviceAccount:service-${PROJECT_NUMBER}@gcp-sa-apigateway.iam.gserviceaccount.com roles/cloudfunctions.invoker" 2>/dev/null || echo "API Gateway invoker IAM import skipped"
+          
+          terraform import module.cloud_function.google_cloud_run_service_iam_member.public_run_invoker[0] "projects/${{ secrets.GCP_PROJECT_ID_DEV }}/locations/us-central1/services/toy-api-function-dev allUsers roles/run.invoker" 2>/dev/null || echo "Cloud Run invoker IAM import skipped"
+          
           # Fix service account permissions
           echo "🔑 Ensuring proper service account permissions..."
-          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID_DEV }} --format="value(projectNumber)")
           COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
           GITHUB_SA="github-actions-dev@${{ secrets.GCP_PROJECT_ID_DEV }}.iam.gserviceaccount.com"
           
@@ -176,6 +190,31 @@ jobs:
         working-directory: ./google-cloud-toy-api/terraform/environments/staging
         run: |
           terraform init
+          
+          # Import existing resources to avoid conflicts
+          echo "🔄 Importing existing resources for staging..."
+          
+          # Import Firestore database if it exists
+          terraform import module.firestore.google_firestore_database.database "projects/${{ secrets.GCP_PROJECT_ID_STAGING }}/databases/(default)" 2>/dev/null || echo "Firestore database import skipped"
+          
+          # Import storage bucket if it exists  
+          terraform import module.cloud_function.google_storage_bucket.source_bucket "${{ secrets.GCP_PROJECT_ID_STAGING }}-cloudfunctions-source-staging" 2>/dev/null || echo "Storage bucket import skipped"
+          
+          # Import Cloud Function if it exists
+          terraform import module.cloud_function.google_cloudfunctions2_function.function "projects/${{ secrets.GCP_PROJECT_ID_STAGING }}/locations/us-central1/functions/toy-api-function-staging" 2>/dev/null || echo "Cloud Function import skipped"
+          
+          # Get project number for subsequent operations
+          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID_STAGING }} --format="value(projectNumber)")
+          
+          # Grant serviceAccountUser permission
+          COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          GITHUB_SA="github-actions-staging@${{ secrets.GCP_PROJECT_ID_STAGING }}.iam.gserviceaccount.com"
+          
+          gcloud iam service-accounts add-iam-policy-binding "$COMPUTE_SA" \
+            --member="serviceAccount:$GITHUB_SA" \
+            --role="roles/iam.serviceAccountUser" \
+            --project="${{ secrets.GCP_PROJECT_ID_STAGING }}" 2>/dev/null || echo "Permission already exists"
+          
           terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_STAGING }}"
           terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_STAGING }}"
 
@@ -226,6 +265,31 @@ jobs:
         working-directory: ./google-cloud-toy-api/terraform/environments/prod
         run: |
           terraform init
+          
+          # Import existing resources to avoid conflicts
+          echo "🔄 Importing existing resources for production..."
+          
+          # Import Firestore database if it exists
+          terraform import module.firestore.google_firestore_database.database "projects/${{ secrets.GCP_PROJECT_ID_PROD }}/databases/(default)" 2>/dev/null || echo "Firestore database import skipped"
+          
+          # Import storage bucket if it exists  
+          terraform import module.cloud_function.google_storage_bucket.source_bucket "${{ secrets.GCP_PROJECT_ID_PROD }}-cloudfunctions-source-prod" 2>/dev/null || echo "Storage bucket import skipped"
+          
+          # Import Cloud Function if it exists
+          terraform import module.cloud_function.google_cloudfunctions2_function.function "projects/${{ secrets.GCP_PROJECT_ID_PROD }}/locations/us-central1/functions/toy-api-function-prod" 2>/dev/null || echo "Cloud Function import skipped"
+          
+          # Get project number for subsequent operations
+          PROJECT_NUMBER=$(gcloud projects describe ${{ secrets.GCP_PROJECT_ID_PROD }} --format="value(projectNumber)")
+          
+          # Grant serviceAccountUser permission
+          COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          GITHUB_SA="github-actions-prod@${{ secrets.GCP_PROJECT_ID_PROD }}.iam.gserviceaccount.com"
+          
+          gcloud iam service-accounts add-iam-policy-binding "$COMPUTE_SA" \
+            --member="serviceAccount:$GITHUB_SA" \
+            --role="roles/iam.serviceAccountUser" \
+            --project="${{ secrets.GCP_PROJECT_ID_PROD }}" 2>/dev/null || echo "Permission already exists"
+          
           terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_PROD }}"
           terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_PROD }}"
 
