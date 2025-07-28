@@ -58,11 +58,11 @@ _HIDDEN/*.*
 !package.json
 !package-lock.json
 !google-cloud-toy-api/package.json
+!google-cloud-toy-api/package-lock.json
 
 # Project specific ignores
 google-cloud-toy-api/dist/
 google-cloud-toy-api/node_modules/
-google-cloud-toy-api/package-lock.json
 google-cloud-toy-api/firebase-debug.log
 google-cloud-toy-api/firestore-debug.log
 google-cloud-toy-api/.firebaserc
@@ -81,9 +81,8 @@ google-cloud-toy-api/terraform/dev/terraform.tfstate
 google-cloud-toy-api/terraform/dev/terraform.tfstate.backup
 google-cloud-toy-api/terraform/dev/.terraform/
 
-# Root project ignores
+# Root project ignores  
 node_modules/
-package-lock.json
 src/
 tsconfig.json
 pom.xml

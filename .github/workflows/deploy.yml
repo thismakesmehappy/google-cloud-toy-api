@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'google-cloud-toy-api/package.json'
+          cache-dependency-path: 'google-cloud-toy-api/package-lock.json'
 
       - name: Install dependencies
         working-directory: ./google-cloud-toy-api
-        run: npm ci
+        run: npm install
 
       - name: Run linter
         working-directory: ./google-cloud-toy-api
