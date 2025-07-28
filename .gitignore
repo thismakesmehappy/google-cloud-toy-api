@@ -51,6 +51,14 @@ firestore-debug.log
 # Local secrets (should not be committed)
 _HIDDEN/
 
+# CI/CD service account keys (NEVER COMMIT THESE)
+.github-keys/
+*-key.json
+*.json
+!package.json
+!package-lock.json
+!google-cloud-toy-api/package.json
+
 # Project specific ignores
 google-cloud-toy-api/dist/
 google-cloud-toy-api/node_modules/

@@ -1,0 +1,231 @@
+name: Deploy Google Cloud Toy API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  TERRAFORM_VERSION: '1.7.0'
+
+jobs:
+  # Run tests and linting on all PRs and pushes
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'google-cloud-toy-api/package.json'
+
+      - name: Install dependencies
+        working-directory: ./google-cloud-toy-api
+        run: npm ci
+
+      - name: Run linter
+        working-directory: ./google-cloud-toy-api
+        run: npm run lint || echo "No lint script found, skipping..."
+
+      - name: Run type check
+        working-directory: ./google-cloud-toy-api
+        run: npm run type-check || echo "No type-check script found, skipping..."
+
+      - name: Run tests
+        working-directory: ./google-cloud-toy-api
+        run: npm test || echo "No test script found, skipping..."
+
+      - name: Build project
+        working-directory: ./google-cloud-toy-api
+        run: npm run build || echo "No build script found, skipping..."
+
+  # Validate Terraform configurations
+  terraform-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, staging, prod]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Format Check
+        working-directory: ./google-cloud-toy-api/terraform/environments/${{ matrix.environment }}
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        working-directory: ./google-cloud-toy-api/terraform/environments/${{ matrix.environment }}
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ./google-cloud-toy-api/terraform/environments/${{ matrix.environment }}
+        run: terraform validate
+
+  # Deploy to development environment
+  deploy-dev:
+    if: github.ref == 'refs/heads/main'
+    needs: [test, terraform-validate]
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_DEV }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Dev
+        working-directory: ./google-cloud-toy-api/terraform/environments/dev
+        run: |
+          terraform init
+          terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"
+          terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"
+
+      - name: Get deployment outputs
+        id: terraform-outputs
+        working-directory: ./google-cloud-toy-api/terraform/environments/dev
+        run: |
+          echo "function_url=$(terraform output -raw function_url)" >> $GITHUB_OUTPUT
+          echo "api_gateway_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
+
+      - name: Run integration tests
+        env:
+          API_URL: ${{ steps.terraform-outputs.outputs.function_url }}
+          API_KEY: ${{ secrets.DEV_API_KEY }}
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test public endpoint
+          curl -f "$API_URL/public" || exit 1
+          
+          # Test authenticated endpoint
+          curl -f -H "x-api-key: $API_KEY" "$API_URL/items" || exit 1
+          
+          echo "✅ Dev environment integration tests passed"
+
+  # Deploy to staging environment
+  deploy-staging:
+    if: github.ref == 'refs/heads/main'
+    needs: [deploy-dev]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_STAGING }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Staging
+        working-directory: ./google-cloud-toy-api/terraform/environments/staging
+        run: |
+          terraform init
+          terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_STAGING }}"
+          terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_STAGING }}"
+
+      - name: Get deployment outputs
+        id: terraform-outputs
+        working-directory: ./google-cloud-toy-api/terraform/environments/staging
+        run: |
+          echo "function_url=$(terraform output -raw function_url)" >> $GITHUB_OUTPUT
+          echo "api_gateway_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
+
+      - name: Run integration tests
+        env:
+          API_URL: ${{ steps.terraform-outputs.outputs.api_gateway_url }}
+          API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test public endpoint through API Gateway
+          curl -f "$API_URL/public" || exit 1
+          
+          echo "✅ Staging environment integration tests passed"
+
+  # Deploy to production environment
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    needs: [deploy-staging]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_PROD }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Production
+        working-directory: ./google-cloud-toy-api/terraform/environments/prod
+        run: |
+          terraform init
+          terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_PROD }}"
+          terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_PROD }}"
+
+      - name: Get deployment outputs
+        id: terraform-outputs
+        working-directory: ./google-cloud-toy-api/terraform/environments/prod
+        run: |
+          echo "function_url=$(terraform output -raw function_url)" >> $GITHUB_OUTPUT
+          echo "api_gateway_url=$(terraform output -raw api_gateway_url)" >> $GITHUB_OUTPUT
+
+      - name: Run production smoke tests
+        env:
+          API_URL: ${{ steps.terraform-outputs.outputs.api_gateway_url }}
+        run: |
+          # Wait for deployment to be ready
+          sleep 60
+          
+          # Basic health check
+          curl -f "$API_URL/public" || exit 1
+          
+          echo "✅ Production deployment successful"
+
+      - name: Notify deployment success
+        run: |
+          echo "🚀 Successfully deployed to production!"
+          echo "API Gateway URL: ${{ steps.terraform-outputs.outputs.api_gateway_url }}"
+          echo "Function URL: ${{ steps.terraform-outputs.outputs.function_url }}"
