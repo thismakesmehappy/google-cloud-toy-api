@@ -46,21 +46,9 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
-# IAM bindings for API Gateway
-resource "google_project_iam_member" "cloud_functions_run_admin" {
-  project = var.project_id
-  role    = "roles/run.admin"
-  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
-}
-
-resource "google_project_iam_member" "api_gateway_token_creator" {
-  project = var.project_id
-  role    = "roles/iam.serviceAccountTokenCreator"
-  member  = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-apigateway.iam.gserviceaccount.com"
-}
-
-resource "google_service_account_iam_member" "api_gateway_can_act_as_function_sa" {
-  service_account_id = "projects/${var.project_id}/serviceAccounts/${data.google_project.project.number}-compute@developer.gserviceaccount.com"
-  role               = "roles/iam.serviceAccountUser"
-  member             = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-apigateway.iam.gserviceaccount.com"
-}
+# Note: IAM bindings for API Gateway are configured manually 
+# via setup scripts to avoid permission issues in CI/CD
+# These bindings already exist:
+# - roles/run.admin for compute service account
+# - roles/iam.serviceAccountTokenCreator for API Gateway service account  
+# - roles/iam.serviceAccountUser for API Gateway to act as compute service account
