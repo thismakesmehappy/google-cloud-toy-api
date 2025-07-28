@@ -20,6 +20,10 @@ resource "google_storage_bucket" "source_bucket" {
   project       = var.project_id
 
   uniform_bucket_level_access = true
+  
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Archive the source code and upload to the bucket

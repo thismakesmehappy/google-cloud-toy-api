@@ -15,4 +15,14 @@ resource "google_firestore_database" "database" {
   location_id             = var.location_id
   type                    = var.database_type
   delete_protection_state = var.delete_protection_enabled ? "DELETE_PROTECTION_ENABLED" : "DELETE_PROTECTION_DISABLED"
+  
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [
+      # Don't recreate if database already exists
+      name,
+      location_id,
+      type
+    ]
+  }
 }

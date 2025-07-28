@@ -99,6 +99,18 @@ jobs:
         working-directory: ./google-cloud-toy-api/terraform/environments/dev
         run: |
           terraform init
+          
+          # Import existing resources to avoid conflicts
+          echo "🔄 Importing existing resources..."
+          
+          # Import Firestore database if it exists
+          terraform import module.firestore.google_firestore_database.database "projects/${{ secrets.GCP_PROJECT_ID_DEV }}/databases/(default)" 2>/dev/null || echo "Firestore database import skipped"
+          
+          # Import storage bucket if it exists  
+          terraform import module.cloud_function.google_storage_bucket.source_bucket "${{ secrets.GCP_PROJECT_ID_DEV }}-cloudfunctions-source-dev" 2>/dev/null || echo "Storage bucket import skipped"
+          
+          echo "✅ Import complete, proceeding with deployment..."
+          
           terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"
           terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID_DEV }}"
 
