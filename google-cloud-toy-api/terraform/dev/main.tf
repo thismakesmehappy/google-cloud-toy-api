@@ -90,7 +90,7 @@ resource "google_cloudfunctions2_function" "toy_api_function" {
       GOOGLE_APPLICATION_CREDENTIALS = ""
       # Add other environment variables here if needed
     }
-    ingress_settings = "ALLOW_INTERNAL_ONLY" # API Gateway will handle external access
+    ingress_settings = "ALLOW_ALL" # Temporarily allow all for testing
     }
 
   depends_on = [
@@ -140,7 +140,7 @@ resource "google_firestore_database" "database" {
 # API Gateway
 resource "google_api_gateway_api" "toy_api_gateway" {
   provider = google-beta
-  api_id  = "toy-api-${var.environment}"
+  api_id  = "toy-api-v2-${var.environment}"
   project = var.project_id
 
   depends_on = [
@@ -168,7 +168,7 @@ resource "google_api_gateway_api_config" "toy_api_config" {
 
 resource "google_api_gateway_gateway" "toy_api_gateway_instance" {
   provider = google-beta
-  gateway_id = "toy-api-gateway-${var.environment}"
+  gateway_id = "toy-api-gateway-v2-${var.environment}"
   api_config = google_api_gateway_api_config.toy_api_config.id
   project    = var.project_id
 
@@ -193,5 +193,33 @@ resource "google_cloudfunctions2_function_iam_member" "invoker" {
   depends_on = [
     google_cloudfunctions2_function.toy_api_function,
     google_project_service.iam_api
+  ]
+}
+
+# IAM binding for public access (for testing)
+resource "google_cloudfunctions2_function_iam_member" "public_invoker" {
+  project        = google_cloudfunctions2_function.toy_api_function.project
+  location       = google_cloudfunctions2_function.toy_api_function.location
+  cloud_function = google_cloudfunctions2_function.toy_api_function.name
+  role           = "roles/cloudfunctions.invoker"
+  member         = "allUsers"
+
+  depends_on = [
+    google_cloudfunctions2_function.toy_api_function,
+    google_project_service.iam_api
+  ]
+}
+
+# IAM binding for Cloud Run public access (Cloud Functions v2 runs on Cloud Run)
+resource "google_cloud_run_service_iam_member" "public_run_invoker" {
+  project  = var.project_id
+  location = var.region
+  service  = google_cloudfunctions2_function.toy_api_function.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+
+  depends_on = [
+    google_cloudfunctions2_function.toy_api_function,
+    google_project_service.cloudrun_api
   ]
 }

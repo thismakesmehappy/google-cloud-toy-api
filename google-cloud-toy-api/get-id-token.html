@@ -1,10 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+ <html>
+ <head>
+     <title>Get Firebase ID Token</title>
+     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+ </head>
+ <body>
+     <h1>Firebase ID Token Generator</h1>
+     <p>Open your browser's developer console (F12) to see the token.</p>
+     <input type="email" id="email" placeholder="Email" value="test@example.com"><br><br>
+     <input type="password" id="password" placeholder="Password" value="password123"><br><br>
+     <button id="signInButton">Sign In and Get Token</button>
+     <div style="margin-top: 3em" id = "token-content"></div>
+     <script>
+         // Your web app's Firebase configuration
+         // Replace with your actual Firebase project config
+         const firebaseConfig = {
+             apiKey: "AIzaSyC9Sy0pp1nlnzRqwzdJsySJ6uD6gx3lttU",
+             authDomain: "toy-api-dev.firebaseapp.com",
+             projectId: "toy-api-dev",
+             storageBucket: "toy-api-dev.firebasestorage.app",
+             messagingSenderId: "476766033465",
+             appId: "1:476766033465:web:f24250be53e144270f9fe8",
+             measurementId: "G-DQPM13X075"
+         };
+         // Initialize Firebase
+         const app = firebase.initializeApp(firebaseConfig);
+         const auth = firebase.auth();
+         document.getElementById('signInButton').addEventListener('click', () => {
+             const email = document.getElementById('email').value;
+             const password = document.getElementById('password').value;
+             auth.signInWithEmailAndPassword(email, password)
+                 .then((userCredential) => {
+                     // Signed in
+                     const user = userCredential.user;
+                     user.getIdToken().then(idToken => {
+                         const tokenHolder = document.getElementById("token-content");
+                         tokenHolder.innerText = idToken;
+                         console.log("Firebase ID Token:", idToken);
+                         alert("Token copied to console. Check your browser's developer console (F12).");
+                     }).catch(error => {
+                         console.error("Error getting ID token:", error);
+                         alert("Error getting ID token. Check console.");
+                     });
+                 })
+                 .catch((error) => {
+                     const errorCode = error.code;
+                     const errorMessage = error.message;
+                     console.error("Error signing in:", errorCode, errorMessage);
+                     alert("Error signing in. Check console.");
+                 });
+         });
+     </script>
+ </body>
+ </html>

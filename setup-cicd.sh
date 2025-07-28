@@ -43,9 +43,35 @@ create_service_account() {
     echo -e "\n${YELLOW}🔧 Setting up service account for $env environment...${NC}"
     
     # Create service account
-    gcloud iam service-accounts create $sa_name \
+    if gcloud iam service-accounts create $sa_name \
         --display-name="GitHub Actions $env" \
-        --project=$project || echo "Service account may already exist"
+        --project=$project 2>/dev/null; then
+        echo "  ✅ Service account created successfully"
+        # Wait for service account to propagate
+        echo "  ⏳ Waiting for service account to propagate..."
+        sleep 10
+    else
+        echo "  ℹ️  Service account already exists, continuing..."
+    fi
+    
+    # Verify service account exists before granting roles
+    echo "  🔍 Verifying service account exists..."
+    local retries=0
+    while [ $retries -lt 30 ]; do
+        if gcloud iam service-accounts describe $sa_email --project=$project >/dev/null 2>&1; then
+            echo "  ✅ Service account verified"
+            break
+        else
+            echo "  ⏳ Waiting for service account to be available... (attempt $((retries+1))/30)"
+            sleep 2
+            ((retries++))
+        fi
+    done
+    
+    if [ $retries -eq 30 ]; then
+        echo -e "  ${RED}❌ Service account not available after 60 seconds${NC}"
+        return 1
+    fi
     
     # Grant necessary roles
     local roles=(
@@ -58,14 +84,19 @@ create_service_account() {
         "roles/run.admin"
     )
     
+    echo "  🔑 Granting IAM roles..."
     for role in "${roles[@]}"; do
-        echo "  Granting $role..."
-        gcloud projects add-iam-policy-binding $project \
+        echo "    - $role"
+        if gcloud projects add-iam-policy-binding $project \
             --member="serviceAccount:$sa_email" \
-            --role="$role"
+            --role="$role" >/dev/null 2>&1; then
+            echo "      ✅ Granted"
+        else
+            echo "      ⚠️  Failed to grant $role (may already exist)"
+        fi
     done
     
-    echo -e "${GREEN}✅ Service account for $env environment created${NC}"
+    echo -e "${GREEN}✅ Service account for $env environment ready${NC}"
 }
 
 # Function to generate service account keys

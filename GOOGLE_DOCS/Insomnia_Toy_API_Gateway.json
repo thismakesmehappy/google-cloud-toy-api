@@ -1,1 +1,313 @@
-{  "_type": "export",  "__export_format": 4,  "__export_date": "2025-07-27T12:00:00.000Z",  "__export_source": "gemini-cli",  "resources": [    {      "_id": "wrk_toy_api_gateway",      "created": 1678886400000,      "description": "Insomnia Workspace for Google Cloud Toy API Gateway",      "name": "Google Cloud Toy API Gateway",      "parentId": null,      "scope": "collection",      "type": "Workspace",      "updated": 1678886400000    },    {      "_id": "env_toy_api_gateway",      "color": null,      "created": 1678886400000,      "data": {        "api_gateway_url": "https://toy-api-gateway-dev-630u6ptl.uc.gateway.dev",        "firebase_id_token": "YOUR_FIREBASE_ID_TOKEN",        "item_id": "YOUR_ITEM_ID"      },      "is_private": false,      "name": "Base Environment",      "parentId": "wrk_toy_api_gateway",      "type": "Environment",      "updated": 1678886400000    },    {      "_id": "fld_public_endpoints",      "created": 1678886400000,      "name": "Public Endpoints",      "parentId": "wrk_toy_api_gateway",      "type": "RequestGroup",      "updated": 1678886400000    },    {      "_id": "req_public_get",      "authentication": {},      "body": {},      "created": 1678886400000,      "description": "Get a public message",      "headers": [],      "method": "GET",      "name": "Get Public Message",      "parameters": [],      "parentId": "fld_public_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400000,      "type": "Request",      "url": "{{ _.api_gateway_url }}/public",      "updated": 1678886400000    },    {      "_id": "fld_auth_endpoints",      "created": 1678886400000,      "name": "Authentication Endpoints",      "parentId": "wrk_toy_api_gateway",      "type": "RequestGroup",      "updated": 1678886400000    },    {      "_id": "req_auth_token",      "authentication": {},      "body": {        "mimeType": "application/json",        "text": "{\n  \"uid\": \"test-user-uid\"\n}"      },      "created": 1678886400000,      "description": "Generate a custom Firebase token (for testing/server-side user creation)",      "headers": [        {          "id": "pair_content_type",          "name": "Content-Type",          "value": "application/json"        }      ],      "method": "POST",      "name": "Generate Custom Token",      "parameters": [],      "parentId": "fld_auth_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400000,      "type": "Request",      "url": "{{ _.api_gateway_url }}/auth/token",      "updated": 1678886400000    },    {      "_id": "fld_private_endpoints",      "created": 1678886400000,      "name": "Private Endpoints",      "parentId": "wrk_toy_api_gateway",      "type": "RequestGroup",      "updated": 1678886400000    },    {      "_id": "req_private_get",      "authentication": {},      "body": {},      "created": 1678886400000,      "description": "Get a private message (requires authentication)",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        }      ],      "method": "GET",      "name": "Get Private Message",      "parameters": [],      "parentId": "fld_private_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400000,      "type": "Request",      "url": "{{ _.api_gateway_url }}/private",      "updated": 1678886400000    },    {      "_id": "fld_items_endpoints",      "created": 1678886400000,      "name": "Items Endpoints",      "parentId": "wrk_toy_api_gateway",      "type": "RequestGroup",      "updated": 1678886400000    },    {      "_id": "req_items_post",      "authentication": {},      "body": {        "mimeType": "application/json",        "text": "{\n  \"message\": \"My new item from Insomnia\"\n}"      },      "created": 1678886400000,      "description": "Create a new item (requires authentication)",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        },        {          "id": "pair_content_type",          "name": "Content-Type",          "value": "application/json"        }      ],      "method": "POST",      "name": "Create Item",      "parameters": [],      "parentId": "fld_items_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400000,      "type": "Request",      "url": "{{ _.api_gateway_url }}/items",      "updated": 1678886400000    },    {      "_id": "req_items_get_all",      "authentication": {},      "body": {},      "created": 1678886400000,      "description": "Get all items for the authenticated user",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        }      ],      "method": "GET",      "name": "Get All Items",      "parameters": [],      "parentId": "fld_items_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400001,      "type": "Request",      "url": "{{ _.api_gateway_url }}/items",      "updated": 1678886400000    },    {      "_id": "req_items_get_by_id",      "authentication": {},      "body": {},      "created": 1678886400000,      "description": "Get an item by ID (requires authentication)",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        }      ],      "method": "GET",      "name": "Get Item by ID",      "parameters": [],      "parentId": "fld_items_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400002,      "type": "Request",      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",      "updated": 1678886400000    },    {      "_id": "req_items_put_by_id",      "authentication": {},      "body": {        "mimeType": "application/json",        "text": "{\n  \"message\": \"Updated message from Insomnia\"\n}"      },      "created": 1678886400000,      "description": "Update an item by ID (requires authentication)",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        },        {          "id": "pair_content_type",          "name": "Content-Type",          "value": "application/json"        }      ],      "method": "PUT",      "name": "Update Item by ID",      "parameters": [],      "parentId": "fld_items_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400003,      "type": "Request",      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",      "updated": 1678886400000    },    {      "_id": "req_items_delete_by_id",      "authentication": {},      "body": {},      "created": 1678886400000,      "description": "Delete an item by ID (requires authentication)",      "headers": [        {          "id": "pair_auth",          "name": "Authorization",          "value": "Bearer {{ _.firebase_id_token }}"        }      ],      "method": "DELETE",      "name": "Delete Item by ID",      "parameters": [],      "parentId": "fld_items_endpoints",      "settingDisableRenderRequestBody": false,      "settingEncodeUrl": true,      "settingFollowRedirects": "global",      "settingSendCookies": true,      "settingStoreCookies": true,      "metaSortKey": -1678886400004,      "type": "Request",      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",      "updated": 1678886400000    }  ]}
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-07-27T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_00_public_message",
+      "parentId": "fld_public",
+      "modified": 1690403700000,
+      "created": 1690403700000,
+      "url": "{{ _.api_gateway_url }}/public",
+      "name": "Get Public Message",
+      "description": "Returns a public message that anyone can access",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1690403700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_01_auth_token",
+      "parentId": "fld_auth",
+      "modified": 1690403800000,
+      "created": 1690403800000,
+      "url": "{{ _.api_gateway_url }}/auth/token",
+      "name": "Generate Custom Token (for testing)",
+      "description": "Generate a custom Firebase token for testing (not for production client login)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"uid\": \"test-user-uid\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690403800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_02_private_message",
+      "parentId": "fld_auth",
+      "modified": 1690403900000,
+      "created": 1690403900000,
+      "url": "{{ _.api_gateway_url }}/private",
+      "name": "Get Private Message",
+      "description": "Returns a message for authenticated users",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690403900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_04_items_list",
+      "parentId": "fld_items",
+      "modified": 1690404100000,
+      "created": 1690404100000,
+      "url": "{{ _.api_gateway_url }}/items",
+      "name": "List Items",
+      "description": "Get all items for the authenticated user",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690404100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_05_items_create",
+      "parentId": "fld_items",
+      "modified": 1690404200000,
+      "created": 1690404200000,
+      "url": "{{ _.api_gateway_url }}/items",
+      "name": "Create Item",
+      "description": "Create a new item for the authenticated user",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"message\": \"My new item created via Insomnia\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690404200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_06_items_get",
+      "parentId": "fld_items",
+      "modified": 1690404300000,
+      "created": 1690404300000,
+      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",
+      "name": "Get Item by ID",
+      "description": "Get a specific item by ID (user can only access their own items)",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690404300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_07_items_update",
+      "parentId": "fld_items",
+      "modified": 1690404400000,
+      "created": 1690404400000,
+      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",
+      "name": "Update Item",
+      "description": "Update an existing item (user can only update their own items)",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"message\": \"My updated item via Insomnia\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690404400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_08_items_delete",
+      "parentId": "fld_items",
+      "modified": 1690404500000,
+      "created": 1690404500000,
+      "url": "{{ _.api_gateway_url }}/items/{{ _.item_id }}",
+      "name": "Delete Item",
+      "description": "Delete an existing item (user can only delete their own items)",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.firebase_id_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1690404500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_public",
+      "parentId": "wrk_google_toyapi",
+      "modified": 1690403600000,
+      "created": 1690403600000,
+      "name": " Public Endpoints",
+      "description": "Endpoints that don't require authentication",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1690403600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_auth",
+      "parentId": "wrk_google_toyapi",
+      "modified": 1690403650000,
+      "created": 1690403650000,
+      "name": " Authentication Endpoints",
+      "description": "Login and authenticated message endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1690403650000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_items",
+      "parentId": "wrk_google_toyapi",
+      "modified": 1690403700000,
+      "created": 1690403700000,
+      "name": " Items Endpoints (Protected)",
+      "description": "CRUD operations for items - all require authentication",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1690403700000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_google_toyapi",
+      "parentId": null,
+      "modified": 1690403500000,
+      "created": 1690403500000,
+      "name": "Google Cloud ToyApi - Serverless API",
+      "description": "Complete Google Cloud ToyApi collection with Firebase JWT authentication",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_google_toyapi",
+      "modified": 1690403550000,
+      "created": 1690403550000,
+      "name": "Base Environment",
+      "data": {
+        "api_gateway_url": "https://toy-api-gateway-dev-630u6ptl.uc.gateway.dev",
+        "firebase_id_token": "",
+        "item_id": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "api_gateway_url",
+          "firebase_id_token",
+          "item_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1690403550000,
+      "_type": "environment"
+    }
+  ]
+}

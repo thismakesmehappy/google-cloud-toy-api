@@ -3,7 +3,7 @@ info:
   title: Toy API
   description: A simple toy API for Google Cloud
   version: 1.0.0
-basePath: /
+
 
 securityDefinitions:
   firebaseAuth:
@@ -20,7 +20,7 @@ paths:
       summary: Public endpoint
       operationId: publicMessage
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       responses:
         "200":
           description: A successful response
@@ -35,7 +35,7 @@ paths:
       operationId: privateMessage
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       responses:
         "200":
           description: A successful response
@@ -50,7 +50,7 @@ paths:
       operationId: createItem
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       consumes:
         - application/json
       parameters:
@@ -70,7 +70,7 @@ paths:
       operationId: getItems
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       responses:
         "200":
           description: List of items
@@ -80,7 +80,7 @@ paths:
       operationId: getItem
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       parameters:
         - in: path
           name: id
@@ -94,7 +94,7 @@ paths:
       operationId: updateItem
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       consumes:
         - application/json
       parameters:
@@ -118,7 +118,7 @@ paths:
       operationId: deleteItem
 
       x-google-backend:
-        address: https://us-central1-toy-api-dev.cloudfunctions.net/toy-api-function-dev # Replace with your function URL
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
       parameters:
         - in: path
           name: id
@@ -127,3 +127,28 @@ paths:
       responses:
         "204":
           description: Item deleted
+  /auth/token:
+    post:
+      summary: Generate a custom Firebase token
+      operationId: generateCustomToken
+      x-google-backend:
+        address: https://toy-api-function-dev-ox3pqfvcqq-uc.a.run.app
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: token_request
+          required: true
+          schema:
+            type: object
+            properties:
+              uid:
+                type: string
+      responses:
+        "200":
+          description: Custom token generated
+          schema:
+            type: object
+            properties:
+              customToken:
+                type: string

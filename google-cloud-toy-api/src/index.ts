@@ -1,20 +1,27 @@
 import express from 'express';
 import { publicMessage } from './functions/public';
 import { privateMessage } from './functions/private';
-import { firebaseAuthMiddleware } from './services/auth';
+import { firebaseAuthMiddleware, simpleAuthMiddleware } from './services/auth';
 import * as admin from 'firebase-admin';
 import { createItem, getItem, getItems, updateItem, deleteItem } from './services/firestore';
 
-export const app = express();
+const expressApp = express();
+expressApp.set('trust proxy', true);
+const router = express.Router();
 
-app.use(express.json()); // Add this line to parse JSON request bodies
+expressApp.use(express.json()); // Add this line to parse JSON request bodies
 
-app.get('/', (req, res) => res.send('Hello from root!'));
-app.get('/public', publicMessage);
-app.get('/private', firebaseAuthMiddleware, privateMessage);
+expressApp.use((req, res, next) => {
+  console.log('Request Path:', req.path, 'URL:', req.url, 'Original URL:', req.originalUrl);
+  next();
+});
+
+router.get('/', (req, res) => res.send('Hello World!'));
+router.get('/public', publicMessage);
+router.get('/private', simpleAuthMiddleware, privateMessage);
 
 // Authentication Endpoint
-app.post('/auth/token', async (req, res) => {
+router.post('/auth/token', async (req, res) => {
   try {
     const { uid } = req.body;
     if (!uid) {
@@ -28,7 +35,7 @@ app.post('/auth/token', async (req, res) => {
 });
 
 // Item CRUD Endpoints
-app.post('/items', firebaseAuthMiddleware, async (req, res) => {
+router.post('/items', simpleAuthMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.uid;
     const { message } = req.body;
@@ -42,7 +49,7 @@ app.post('/items', firebaseAuthMiddleware, async (req, res) => {
   }
 });
 
-app.get('/items', firebaseAuthMiddleware, async (req, res) => {
+router.get('/items', simpleAuthMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.uid;
     const items = await getItems(userId);
@@ -52,7 +59,7 @@ app.get('/items', firebaseAuthMiddleware, async (req, res) => {
   }
 });
 
-app.get('/items/:id', firebaseAuthMiddleware, async (req, res) => {
+router.get('/items/:id', simpleAuthMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.uid;
     const item = await getItem(req.params.id, userId);
@@ -65,7 +72,7 @@ app.get('/items/:id', firebaseAuthMiddleware, async (req, res) => {
   }
 });
 
-app.put('/items/:id', firebaseAuthMiddleware, async (req, res) => {
+router.put('/items/:id', simpleAuthMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.uid;
     const { message } = req.body;
@@ -82,7 +89,7 @@ app.put('/items/:id', firebaseAuthMiddleware, async (req, res) => {
   }
 });
 
-app.delete('/items/:id', firebaseAuthMiddleware, async (req, res) => {
+router.delete('/items/:id', simpleAuthMiddleware, async (req, res) => {
   try {
     const userId = (req as any).user.uid;
     const success = await deleteItem(req.params.id, userId);
@@ -94,3 +101,15 @@ app.delete('/items/:id', firebaseAuthMiddleware, async (req, res) => {
     res.status(500).send(`Error deleting item: ${error.message}`);
   }
 });
+
+expressApp.use('/', router);
+
+// Export for local development
+export { expressApp };
+
+// Google Cloud Functions v2 entry point
+import { HttpFunction } from '@google-cloud/functions-framework';
+
+export const app: HttpFunction = (req, res) => {
+  return expressApp(req, res);
+};

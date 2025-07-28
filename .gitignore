@@ -50,7 +50,7 @@ firestore-debug.log
 
 # Local secrets (should not be committed)
 _HIDDEN/
-
+_HIDDEN/*.*
 # CI/CD service account keys (NEVER COMMIT THESE)
 .github-keys/
 *-key.json
@@ -87,3 +87,4 @@ package-lock.json
 src/
 tsconfig.json
 pom.xml
+/_HIDDEN/
