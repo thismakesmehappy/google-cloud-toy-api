@@ -59,6 +59,10 @@ _HIDDEN/*.*
 !package-lock.json
 !google-cloud-toy-api/package.json
 !google-cloud-toy-api/package-lock.json
+# Firebase service account keys - NEVER COMMIT
+*firebase-adminsdk*.json
+google-cloud-toy-api/*firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
 
 # Project specific ignores
 google-cloud-toy-api/dist/
