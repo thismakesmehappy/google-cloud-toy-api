@@ -63,6 +63,8 @@ _HIDDEN/*.*
 *firebase-adminsdk*.json
 google-cloud-toy-api/*firebase-adminsdk*.json
 *-firebase-adminsdk-*.json
+google-cloud-toy-api/firebase-service-account-key.json
+firebase-service-account-key.json
 
 # Project specific ignores
 google-cloud-toy-api/dist/
@@ -87,7 +89,6 @@ google-cloud-toy-api/terraform/dev/.terraform/
 
 # Root project ignores  
 node_modules/
-src/
 tsconfig.json
 pom.xml
 /_HIDDEN/
