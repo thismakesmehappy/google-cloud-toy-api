@@ -16,7 +16,7 @@ expressApp.use((req, res, next) => {
   next();
 });
 
-router.get('/', (req, res) => res.send('Hello World!'));
+router.get('/', (req, res) => res.send('Hello World! Clean build'));
 router.get('/public', publicMessage);
 router.get('/private', simpleAuthMiddleware, privateMessage);
 
