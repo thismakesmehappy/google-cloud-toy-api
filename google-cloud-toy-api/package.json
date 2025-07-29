@@ -2,14 +2,15 @@
   "name": "google-cloud-toy-api",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "test": "echo \"No tests configured yet\" && exit 0",
     "lint": "echo \"No linter configured yet\" && exit 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "gcp-build": "tsc"
   },
   "keywords": [],
   "author": "",
