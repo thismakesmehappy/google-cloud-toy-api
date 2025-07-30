@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+firebase-debug.log
+firestore-debug.log
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 .report/
@@ -14,14 +16,6 @@ lerna-debug.log*
 node_modules/
 dist/
 build/
-.next/
-.nuxt/
-.vuepress/dist/
-.serverless/
-.yarn/
-.pnp/
-.pnp.js
-.parcel-cache/
 
 # TypeScript
 *.tsbuildinfo
@@ -36,59 +30,51 @@ build/
 
 # OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Firebase
-firebase-debug.log
-firestore-debug.log
+# Docker
+.docker/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Firebase service account keys - NEVER COMMIT
+*firebase-adminsdk*.json
+firebase-service-account-key.json
+*-firebase-adminsdk-*.json
+
+# Google Cloud service account keys - NEVER COMMIT
+*-key.json
+service-account-*.json
 
 # Terraform
 .terraform/
 *.tfplan
 *.tfstate
 *.tfstate.backup
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
 
-# Local secrets (should not be committed)
+# Build artifacts
+function-source.zip
+*.zip
+
+# Local secrets and development files
 _HIDDEN/
-_HIDDEN/*.*
-# CI/CD service account keys (NEVER COMMIT THESE)
-.github-keys/
-*-key.json
-*.json
-!package.json
-!package-lock.json
-!google-cloud-toy-api/package.json
-!google-cloud-toy-api/package-lock.json
-# Firebase service account keys - NEVER COMMIT
-*firebase-adminsdk*.json
-google-cloud-toy-api/*firebase-adminsdk*.json
-*-firebase-adminsdk-*.json
-google-cloud-toy-api/firebase-service-account-key.json
-firebase-service-account-key.json
+local-secrets.md
+get-id-token.html
 
-# Project specific ignores
+# Project specific
+google-cloud-toy-api/firebase-service-account-key.json
 google-cloud-toy-api/dist/
 google-cloud-toy-api/node_modules/
-google-cloud-toy-api/firebase-debug.log
-google-cloud-toy-api/firestore-debug.log
-google-cloud-toy-api/.firebaserc
-google-cloud-toy-api/.gcloudignore
-google-cloud-toy-api/.gitignore
-google-cloud-toy-api/firebase.json
-google-cloud-toy-api/firestore.indexes.json
-google-cloud-toy-api/firestore.rules
-google-cloud-toy-api/tsconfig.json
-google-cloud-toy-api/terraform/*.tfstate
-google-cloud-toy-api/terraform/*.tfstate.backup
-google-cloud-toy-api/terraform/.terraform/
-google-cloud-toy-api/terraform/dev/.terraform.lock.hcl
-google-cloud-toy-api/terraform/dev/function-source.zip
-google-cloud-toy-api/terraform/dev/terraform.tfstate
-google-cloud-toy-api/terraform/dev/terraform.tfstate.backup
-google-cloud-toy-api/terraform/dev/.terraform/
-
-# Root project ignores  
-node_modules/
-tsconfig.json
-pom.xml
-/_HIDDEN/
