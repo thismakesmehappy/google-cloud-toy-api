@@ -9,10 +9,6 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.0"
     }
-    archive = {
-      source  = "hashicorp/archive"
-      version = "~> 2.0"
-    }
   }
 }
 
@@ -33,28 +29,28 @@ module "shared" {
   project_id = var.project_id
 }
 
-# Archive the source code
-data "archive_file" "source_zip" {
-  type        = "zip"
-  source_dir  = "../../../"
-  output_path = "function-source.zip"
-  excludes    = ["terraform/", "dist/", "node_modules/", ".git/", "_HIDDEN/", "*.md"]
-}
+# Cloud Run Service
+module "cloud_run" {
+  source = "../../modules/cloud-run"
 
-# Cloud Function
-module "cloud_function" {
-  source = "../../modules/cloud-function"
+  project_id      = var.project_id
+  region          = var.region
+  environment     = var.environment
+  container_image = var.container_image
 
-  project_id          = var.project_id
-  project_number      = module.shared.project_number
-  region              = var.region
-  environment         = var.environment
-  source_archive_path = data.archive_file.source_zip.output_path
-  source_hash         = data.archive_file.source_zip.output_base64sha256
+  # Staging-specific settings (more restrictive than dev)
+  enable_public_access        = false # Only authenticated access
+  enable_authenticated_access = true
+  
+  # Moderate resource limits for staging
+  cpu_limit     = "1000m"
+  memory_limit  = "1Gi"
+  min_instances = 0
+  max_instances = 10
 
-  # Staging-specific settings
-  ingress_settings     = "ALLOW_INTERNAL_ONLY" # More restrictive than dev
-  enable_public_access = false                 # Disable public access
+  environment_variables = {
+    API_KEY = var.api_key
+  }
 
   depends_on = [
     module.shared
@@ -70,24 +66,6 @@ module "firestore" {
   delete_protection_enabled = true # Enable protection for staging
 
   depends_on = [
-    module.shared
-  ]
-}
-
-# API Gateway
-module "api_gateway" {
-  source = "../../modules/api-gateway"
-
-  project_id  = var.project_id
-  region      = var.region
-  environment = var.environment
-  openapi_spec = templatefile("${path.module}/openapi.yaml", {
-    backend_url = module.cloud_function.function_url
-    project_id  = var.project_id
-  })
-
-  depends_on = [
-    module.cloud_function,
     module.shared
   ]
 }
