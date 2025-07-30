@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - FIREBASE_FIRESTORE_EMULATOR_HOST=firestore:8181
+      - API_KEY=dev-api-key-123
+    volumes:
+      - ./firebase-service-account-key.json:/app/firebase-service-account-key.json:ro
+    depends_on:
+      - firestore
+    networks:
+      - app-network
+
+  firestore:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    ports:
+      - "8181:8181"
+      - "4000:4000"
+    command: >
+      sh -c "gcloud emulators firestore start 
+             --host-port=0.0.0.0:8181 
+             --rules=/rules/firestore.rules"
+    volumes:
+      - ./firestore.rules:/rules/firestore.rules:ro
+      - firestore-data:/data
+    networks:
+      - app-network
+
+volumes:
+  firestore-data:
+
+networks:
+  app-network:
+    driver: bridge

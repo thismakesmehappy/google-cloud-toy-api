@@ -9,10 +9,6 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.0"
     }
-    archive = {
-      source  = "hashicorp/archive"
-      version = "~> 2.0"
-    }
   }
 }
 
@@ -33,28 +29,27 @@ module "shared" {
   project_id = var.project_id
 }
 
-# Archive the source code
-data "archive_file" "source_zip" {
-  type        = "zip"
-  source_dir  = "../../../"
-  output_path = "function-source.zip"
-  excludes    = ["terraform/", "dist/", "node_modules/", ".git/", "_HIDDEN/", "*.md"]
-}
+# Cloud Run Service
+module "cloud_run" {
+  source = "../../modules/cloud-run"
 
-# Cloud Function
-module "cloud_function" {
-  source = "../../modules/cloud-function"
-
-  project_id          = var.project_id
-  project_number      = module.shared.project_number
-  region              = var.region
-  environment         = var.environment
-  source_archive_path = data.archive_file.source_zip.output_path
-  source_hash         = data.archive_file.source_zip.output_base64sha256
+  project_id      = var.project_id
+  region          = var.region
+  environment     = var.environment
+  container_image = var.container_image
 
   # Development-specific settings
-  ingress_settings     = "ALLOW_ALL" # Allow all for testing
-  enable_public_access = true        # Enable public access for testing
+  enable_public_access        = true  # Enable public access for testing
+  enable_authenticated_access = true
+  
+  # Resource limits for dev (smaller)
+  cpu_limit    = "1000m"
+  memory_limit = "512Mi"
+  max_instances = 5
+
+  environment_variables = {
+    API_KEY = var.api_key
+  }
 
   depends_on = [
     module.shared
@@ -70,24 +65,6 @@ module "firestore" {
   delete_protection_enabled = false # Disable for dev environment
 
   depends_on = [
-    module.shared
-  ]
-}
-
-# API Gateway
-module "api_gateway" {
-  source = "../../modules/api-gateway"
-
-  project_id  = var.project_id
-  region      = var.region
-  environment = var.environment
-  openapi_spec = templatefile("${path.module}/openapi.yaml", {
-    backend_url = module.cloud_function.function_url
-    project_id  = var.project_id
-  })
-
-  depends_on = [
-    module.cloud_function,
     module.shared
   ]
 }

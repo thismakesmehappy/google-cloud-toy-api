@@ -102,12 +102,15 @@ router.delete('/items/:id', simpleAuthMiddleware, async (req, res) => {
 
 expressApp.use('/', router);
 
-// Export for local development
+// Export for local development and testing
 export { expressApp };
 
-// Google Cloud Functions v2 entry point
-import { HttpFunction } from '@google-cloud/functions-framework';
+// Cloud Run server entry point
+const port = process.env.PORT || 8080;
 
-export const app: HttpFunction = (req, res) => {
-  return expressApp(req, res);
-};
+if (require.main === module) {
+  expressApp.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}

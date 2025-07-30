@@ -1,14 +1,19 @@
-output "function_url" {
-  description = "URL of the Cloud Function"
-  value       = module.cloud_function.function_url
+output "service_url" {
+  description = "The URL of the Cloud Run service"
+  value       = module.cloud_run.service_url
 }
 
-output "api_gateway_url" {
-  description = "URL of the API Gateway"
-  value       = "https://${module.api_gateway.gateway_url}"
+output "service_name" {
+  description = "The name of the Cloud Run service"
+  value       = module.cloud_run.service_name
 }
 
-output "function_name" {
-  description = "Name of the Cloud Function"
-  value       = module.cloud_function.function_name
+output "service_account_email" {
+  description = "The email of the service account used by the Cloud Run service"
+  value       = module.cloud_run.service_account_email
+}
+
+output "firestore_database" {
+  description = "The Firestore database name"
+  value       = module.firestore.database_name
 }
