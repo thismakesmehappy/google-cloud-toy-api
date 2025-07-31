@@ -14,10 +14,10 @@ NC='\033[0m' # No Color
 
 # Configuration - UPDATE THESE VALUES
 PROJECT_ID_DEV="toy-api-dev"
-PROJECT_ID_STAGING="toy-api-staging" 
+PROJECT_ID_STAGING="toy-api-stage" 
 PROJECT_ID_PROD="toy-api-prod"
-REPO_NAME="TestGoogleAPI"
-GITHUB_OWNER=""  # REQUIRED: Set your GitHub username
+REPO_NAME="google-cloud-toy-api"
+GITHUB_OWNER="thismakesmehappy"  # Set to your GitHub username
 REGION="us-central1"
 
 echo -e "${BLUE}🚀 Activating Cloud Build CI/CD Pipeline${NC}"
@@ -66,7 +66,7 @@ setup_cloud_build() {
     gcloud services enable cloudbuild.googleapis.com --quiet
     gcloud services enable run.googleapis.com --quiet
     gcloud services enable containerregistry.googleapis.com --quiet
-    gcloud services enable sourcerepo.googleapis.com --quiet
+    # Note: sourcerepo.googleapis.com not needed for GitHub integration
     
     # Get project number for IAM binding
     PROJECT_NUMBER=$(gcloud projects describe $project_id --format="value(projectNumber)")
