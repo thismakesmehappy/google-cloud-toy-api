@@ -3,6 +3,8 @@ import { publicMessage, privateMessage } from './functions';
 import { firebaseAuthMiddleware, simpleAuthMiddleware, createItem, getItem, getItems, updateItem, deleteItem } from './services';
 import * as admin from 'firebase-admin';
 
+// Test comment for develop branch workflow verification - should deploy to dev environment only
+
 const expressApp = express();
 expressApp.set('trust proxy', true);
 const router = express.Router();
