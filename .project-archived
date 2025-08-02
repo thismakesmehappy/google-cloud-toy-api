@@ -1,0 +1,27 @@
+PROJECT ARCHIVED - AUGUST 2, 2025
+
+This Google Cloud Toy API project has been officially archived.
+
+STATUS: Complete decommission successful
+- All billable resources removed ($0/month ongoing costs)
+- 2/3 Google Cloud projects deleted
+- CI/CD pipeline fully disabled
+- Repository preserved for educational purposes
+
+COMMIT SAFETY: ✅ SAFE
+- No active build triggers
+- No deployment automation
+- All target environments decommissioned
+
+This repository now serves as a comprehensive example of:
+- Enterprise-grade local development practices
+- Google Cloud infrastructure patterns  
+- Testing strategies (43 tests, 86.3% coverage)
+- What NOT to do: over-engineering before deployment
+
+See PROJECT_RETROSPECTIVE.md for full analysis.
+
+---
+Archived by: Claude AI agentic cleanup
+Date: August 2, 2025
+Final commit: Project closure and archive marker
